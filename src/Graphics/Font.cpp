@@ -156,7 +156,13 @@ uint32_t Font::draw(int x, int y, const std::string &text, uint32_t color, bool 
   while (it != text.end() )
   {
     char32_t ch;
-    ch = utf8::next(it, text.end());
+    try {
+        ch = utf8::next(it, text.end());
+    } catch (utf8::invalid_utf8& e)
+    {
+        LOG_WARNING("UTF8 decoding error: {}", e.what());
+        ch = 0x3F;
+    }
 
     Glyph glyph = this->glyph(ch);
     SDL_Texture *atlas  = this->atlas(glyph.atlasid);
